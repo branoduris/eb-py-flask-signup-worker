@@ -91,8 +91,10 @@ def customer_registered():
 def test_scheduled():
     logging.info("Scheduled task called")
 
-    if request.json is not None:
-        logging.debug("Received message: %s" % request.json)
+    # logging.debug("Received request: %s" % request)
+    #
+    # if request.json is not None:
+    #     logging.debug("Received message: %s" % request.json)
     logging.debug("Headers: %s" % request.headers)
 
     return Response("", status=200)
