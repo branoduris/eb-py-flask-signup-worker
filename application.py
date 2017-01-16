@@ -89,7 +89,8 @@ def customer_registered():
 
 @application.route('/test-scheduled', methods=['POST'])
 def test_scheduled():
-    logging.info("Request: %s" % request)
+    logging.debug("Received message: %s" % request.json)
+    logging.debug("Headers: %s" % request.headers)
 
     return Response("", status=200)
 
