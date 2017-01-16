@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
+
 import logging
+import logging.handlers
 import json
 
 import flask
@@ -25,9 +28,28 @@ application = flask.Flask(__name__)
 application.config.from_object('default_config')
 application.debug = application.config['FLASK_DEBUG'] in ['true', 'True']
 
-# Email message vars
-SUBJECT = "Thanks for signing up!"
-BODY = "Hi %s!\n\nWe're excited that you're excited about our new product! We'll let you know as soon as it's available.\n\nThanks,\n\nA New Startup"
+
+# # Create logger
+# logger = logging.getLogger(__name__)
+# logger.setLevel(logging.DEBUG)
+#
+# # Handler
+# LOG_FILE = '/opt/python/log/tcw-app.log'
+# # handler = logging.handlers.RotatingFileHandler(LOG_FILE, maxBytes=1048576, backupCount=5)
+# handler = logging.handlers.logging.StreamHandler(sys.stdout)
+# handler.setLevel(logging.INFO)
+#
+# # Formatter
+# formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+#
+# # Add Formatter to Handler
+# handler.setFormatter(formatter)
+#
+# # add Handler to Logger
+# logger.addHandler(handler)
+
+
+logging.basicConfig(level=application.config['LOGGING_LEVEL'])
 
 @application.route('/customer-registered', methods=['POST'])
 def customer_registered():
@@ -41,15 +63,15 @@ def customer_registered():
         response = Response("", status=415)
     else:
         # message = dict()
-        # try:
+        try:
             # If the message has an SNS envelope, extract the inner message
-            if request.json.has_key('TopicArn') and request.json.has_key('Message'):
+            if 'TopicArn' in request.json and 'Message' in request.json:
                 message = json.loads(request.json['Message'])
             else:
                 message = request.json
 
-            logging.info("Received message: %s" % message)
-            logging.info("Headers: %s" % request.headers)
+            logging.debug("Received message: %s" % message)
+            logging.debug("Headers: %s" % request.headers)
         #
         #     # Connect to SES and send an e-mail
         #     ses = boto.ses.connect_to_region(application.config['AWS_REGION'])
@@ -58,9 +80,9 @@ def customer_registered():
         #                    body=BODY % (message['name']),
         #                    to_addresses=[message['email']])
             response = Response("", status=200)
-        # except Exception as ex:
-        #     logging.exception('Error processing message: %s' % request.json)
-        #     response = Response(ex.message, status=500)
+        except Exception as ex:
+            logging.exception('Error processing message: %s' % request.json)
+            response = Response(ex.message, status=500)
 
     return response
 
