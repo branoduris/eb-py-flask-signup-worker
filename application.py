@@ -33,6 +33,8 @@ BODY = "Hi %s!\n\nWe're excited that you're excited about our new product! We'll
 def customer_registered():
     """Send an e-mail using SES"""
 
+
+
     response = None
     if request.json is None:
         # Expect application/json request
@@ -40,11 +42,14 @@ def customer_registered():
     else:
         # message = dict()
         # try:
-        #     # If the message has an SNS envelope, extract the inner message
-        #     if request.json.has_key('TopicArn') and request.json.has_key('Message'):
-        #         message = json.loads(request.json['Message'])
-        #     else:
-        #         message = request.json
+            # If the message has an SNS envelope, extract the inner message
+            if request.json.has_key('TopicArn') and request.json.has_key('Message'):
+                message = json.loads(request.json['Message'])
+            else:
+                message = request.json
+
+            logging.info("Received message: %s" % message)
+            logging.info("Headers: %s" % request.headers)
         #
         #     # Connect to SES and send an e-mail
         #     ses = boto.ses.connect_to_region(application.config['AWS_REGION'])
@@ -62,6 +67,8 @@ def customer_registered():
 
 @application.route('/test-scheduled', methods=['POST'])
 def test_scheduled():
+    logging.info("Request: %s" % request)
+
     return Response("", status=200)
 
 if __name__ == '__main__':
