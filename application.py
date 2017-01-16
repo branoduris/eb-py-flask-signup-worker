@@ -38,24 +38,24 @@ def customer_registered():
         # Expect application/json request
         response = Response("", status=415)
     else:
-        message = dict()
-        try:
-            # If the message has an SNS envelope, extract the inner message
-            if request.json.has_key('TopicArn') and request.json.has_key('Message'):
-                message = json.loads(request.json['Message'])
-            else:
-                message = request.json
-            
-            # Connect to SES and send an e-mail    
-            ses = boto.ses.connect_to_region(application.config['AWS_REGION'])
-            ses.send_email(source=application.config['SOURCE_EMAIL_ADDRESS'],
-                           subject=SUBJECT,
-                           body=BODY % (message['name']),
-                           to_addresses=[message['email']])
+        # message = dict()
+        # try:
+        #     # If the message has an SNS envelope, extract the inner message
+        #     if request.json.has_key('TopicArn') and request.json.has_key('Message'):
+        #         message = json.loads(request.json['Message'])
+        #     else:
+        #         message = request.json
+        #
+        #     # Connect to SES and send an e-mail
+        #     ses = boto.ses.connect_to_region(application.config['AWS_REGION'])
+        #     ses.send_email(source=application.config['SOURCE_EMAIL_ADDRESS'],
+        #                    subject=SUBJECT,
+        #                    body=BODY % (message['name']),
+        #                    to_addresses=[message['email']])
             response = Response("", status=200)
-        except Exception as ex:
-            logging.exception('Error processing message: %s' % request.json)
-            response = Response(ex.message, status=500)
+        # except Exception as ex:
+        #     logging.exception('Error processing message: %s' % request.json)
+        #     response = Response(ex.message, status=500)
 
     return response
 
